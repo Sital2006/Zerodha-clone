@@ -198,20 +198,33 @@ app.get("/allPositions", async (req, res) => {
 });
 
 app.post("/newOrder", async (req, res) => {
-  let newOrder = new OrdersModel({
-    name: req.body.name,
-    qty: req.body.qty,
-    price: req.body.price,
-    mode: req.body.mode,
+  try {
+    const newOrder = new OrdersModel({
+      name: req.body.name,
+      qty: req.body.qty,
+      price: req.body.price,
+      mode: req.body.mode,
+    });
+
+    await newOrder.save();
+
+    console.log("Order saved:", newOrder);
+
+    res.status(201).send("Order saved!");
+  } catch (error) {
+    console.log("Order save error:", error);
+    res.status(500).send("Error saving order");
+  }
+});
+
+mongoose.connect(uri)
+  .then(() => {
+    console.log("MongoDB connected successfully");
+
+    app.listen(PORT, () => {
+      console.log("App started!");
+    });
+  })
+  .catch((error) => {
+    console.log("MongoDB connection error:", error);
   });
-
-  newOrder.save();
-
-  res.send("Order saved!");
-});
-
-app.listen(PORT, () => {
-  console.log("App started!");
-  mongoose.connect(uri);
-  console.log("DB started!");
-});
